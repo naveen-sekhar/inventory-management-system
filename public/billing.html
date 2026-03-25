@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Entry & Billing</title>
+    <link rel="stylesheet" href="common-theme.css">
+    <link rel="stylesheet" href="dashboard-styles.css">
+    <style>
+        .billing-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-lg);
+        }
+
+        .billing-header {
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border);
+            padding: var(--space-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .header-left h1 {
+            margin: 0 0 var(--space-sm);
+            font-size: var(--font-size-3xl);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .header-left p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: var(--font-size-sm);
+        }
+
+        .header-right {
+            text-align: right;
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+        }
+
+        .header-right span {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .billing-grid {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: var(--space-lg);
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .panel.with-overflow {
+            overflow: visible;
+        }
+
+        .panel-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .panel-section:last-child {
+            border-bottom: none;
+        }
+
+        .panel-section.flush {
+            padding: 0;
+        }
+
+        .panel-section.no-border {
+            border-bottom: none;
+        }
+
+        .panel.stacked {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .section-title {
+            margin: 0 0 var(--space-md);
+            font-size: var(--font-size-sm);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(180px, 1fr));
+            gap: var(--space-md);
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-field label {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-field input,
+        .form-field select {
+            padding: 10px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: var(--surface);
+        }
+
+        .form-field input:focus,
+        .form-field select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+        }
+
+        .product-input-row {
+            display: grid;
+            grid-template-columns: 2fr 120px 120px 120px;
+            gap: 16px;
+            align-items: end;
+        }
+
+        .barcode-input {
+            position: relative;
+        }
+
+        .barcode-input input {
+            padding-right: 46px;
+        }
+
+        .scan-icon {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: var(--text-muted);
+        }
+
+        .product-suggestions {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 20px 35px rgba(15, 23, 42, 0.12);
+            max-height: 260px;
+            overflow-y: auto;
+            display: none;
+            z-index: 20;
+        }
+
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .products-table thead {
+            background: var(--surface-subtle);
+        }
+
+        .products-table th {
+            padding: 12px 20px;
+            text-align: left;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .products-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .products-table tr:hover td {
+            background: var(--surface-subtle);
+        }
+
+        .qty-input {
+            width: 70px;
+            padding: 6px 8px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .remove-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            background: rgba(239, 68, 68, 0.08);
+            color: var(--danger);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .remove-btn:hover {
+            background: rgba(239, 68, 68, 0.12);
+        }
+
+        .empty-cart {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 48px 20px;
+        }
+
+        .empty-cart .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: block;
+            opacity: 0.6;
+        }
+
+        .discount-options {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .discount-options button {
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            background: var(--surface-subtle);
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .discount-options button.active,
+        .discount-options button:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        .totals-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .totals-card h3 {
+            margin: 0;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            opacity: 0.85;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            opacity: 0.9;
+        }
+
+        .total-row strong {
+            font-size: 24px;
+            letter-spacing: -0.02em;
+            opacity: 1;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+        }
+
+        .action-btn.primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .action-btn.success {
+            background: var(--success);
+            color: #fff;
+            grid-column: 1 / -1;
+        }
+
+        .action-btn.outline {
+            background: var(--surface);
+            color: var(--text);
+            border-color: var(--border);
+        }
+
+        .notification {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            min-width: 280px;
+            background: var(--surface);
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+            border-radius: 12px;
+            padding: 16px 20px;
+            color: var(--text);
+            display: none;
+            z-index: 999;
+        }
+
+        .notification.show {
+            display: block;
+        }
+
+        .notification.success {
+            border-left-color: var(--success);
+        }
+
+        .notification.error {
+            border-left-color: var(--danger);
+        }
+
+        .notification.info {
+            border-left-color: var(--primary);
+        }
+
+        @media (max-width: 1100px) {
+            .billing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .panel {
+                order: unset;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .billing-wrapper {
+                padding: 20px 16px;
+            }
+
+            .form-grid,
+            .product-input-row,
+            .actions-grid,
+            .discount-options {
+                grid-template-columns: 1fr;
+            }
+
+            .billing-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .header-right {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="billing-wrapper">
+        <a class="back-button" href="dashboard.html">← Back to Dashboard</a>
+
+        <header class="billing-header">
+            <div class="header-left">
+                <h1>Sales Entry &amp; Billing</h1>
+                <p>Process sales, generate invoices, and keep inventory in sync</p>
+            </div>
+            <div class="header-right">
+                <div>Invoice: <span id="invoiceNumber">—</span></div>
+                <div>Date: <span id="invoiceDate">—</span></div>
+                <div>Staff: <span id="staffName">—</span></div>
+            </div>
+        </header>
+
+        <div class="billing-grid">
+            <section class="panel with-overflow">
+                <div class="panel-section">
+                    <h2 class="section-title">Customer</h2>
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label for="customerName">Customer Name</label>
+                            <input id="customerName" placeholder="Enter customer name" type="text">
+                        </div>
+                        <div class="form-field">
+                            <label for="customerPhone">Phone Number</label>
+                            <input id="customerPhone" placeholder="Enter phone number" type="tel">
+                        </div>
+                        <div class="form-field">
+                            <label for="paymentMethod">Payment Method</label>
+                            <select id="paymentMethod">
+                                <option value="cash">Cash</option>
+                                <option value="card">Card</option>
+                                <option value="upi">UPI</option>
+                                <option value="wallet">Wallet</option>
+                                <option value="credit">Credit</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h2 class="section-title">Add Products</h2>
+                    <div class="product-input-row">
+                        <div class="form-field barcode-input">
+                            <label for="productSearch">Product / Barcode</label>
+                            <input autocomplete="off" id="productSearch" placeholder="Search name, SKU, or scan barcode"
+                                type="text">
+                            <span class="scan-icon" title="Scan barcode">📷</span>
+                            <div class="product-suggestions" id="productSuggestions"></div>
+                        </div>
+                        <div class="form-field">
+                            <label for="productQuantity">Quantity</label>
+                            <input id="productQuantity" min="1" placeholder="Qty" type="number" value="1">
+                        </div>
+                        <div class="form-field">
+                            <label for="productPrice">Unit Price</label>
+                            <input id="productPrice" placeholder="0.00" step="0.01" type="number" readonly>
+                        </div>
+                        <div class="form-field">
+                            <label>&nbsp;</label>
+                            <button class="action-btn primary" onclick="addProductToCart()" type="button">Add
+                                Item</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section flush">
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Product ID</th>
+                                <th>Product</th>
+                                <th>Unit Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cartTableBody">
+                            <tr>
+                                <td class="empty-cart" colspan="7">
+                                    <span class="icon">Cart</span>
+                                    <strong>No products yet</strong>
+                                    <div>Add items above to build this invoice.</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <aside class="panel stacked">
+                <div class="panel-section">
+                    <h2 class="section-title">Discounts</h2>
+                    <div class="discount-options">
+                        <button class="active" onclick="applyDiscount(0)" type="button">No Discount</button>
+                        <button onclick="applyDiscount(5)" type="button">5% Off</button>
+                        <button onclick="applyDiscount(10)" type="button">10% Off</button>
+                        <button onclick="applyDiscount(15)" type="button">15% Off</button>
+                    </div>
+                    <div class="form-field">
+                        <label for="customDiscount">Custom Discount (%)</label>
+                        <input id="customDiscount" max="100" min="0" oninput="applyDiscount(this.value)" type="number"
+                            value="0">
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <div class="totals-card">
+                        <h3>Summary</h3>
+                        <div class="total-row">
+                            <span>Subtotal</span>
+                            <span>₹<span id="subtotal">0.00</span></span>
+                        </div>
+                        <div class="total-row">
+                            <span>GST (18%)</span>
+                            <span>₹<span id="gst">0.00</span></span>
+                        </div>
+                        <div class="total-row">
+                            <span>Discount (<span id="discountPercent">0</span>%)</span>
+                            <span>−₹<span id="discountAmount">0.00</span></span>
+                        </div>
+                        <div class="total-row">
+                            <span>Total Due</span>
+                            <strong>₹<span id="grandTotal">0.00</span></strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section no-border">
+                    <div class="actions-grid">
+                        <button class="action-btn outline" onclick="clearBill()" type="button">Clear</button>
+                        <button class="action-btn outline" onclick="printReceipt()" type="button">Print</button>
+                        <button class="action-btn primary" onclick="saveBill()" type="button">Save</button>
+                        <button class="action-btn success" onclick="saveAndPrint()" type="button">Save &amp;
+                            Print</button>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script src="billing.js"></script>
+</body>
+
+</html>

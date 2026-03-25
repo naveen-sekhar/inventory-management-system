@@ -1,0 +1,432 @@
+/* ============================================
+   STYLES.CSS - Legacy Dashboard Support
+   Imports common theme and adds dashboard-specific styles
+   ============================================ */
+
+@import url('common-theme.css');
+
+/* Page Management */
+.page {
+    display: none;
+    width: 100%;
+}
+
+.page.active {
+    display: block;
+}
+
+/* Login Page Centering */
+#loginPage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* Database Status Indicator */
+.status-bar {
+    background: var(--surface);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-md);
+    border: 1px solid var(--border);
+}
+
+.db-status {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+.db-status.connected .status-dot {
+    background: var(--success);
+    animation: none;
+}
+
+.db-status.disconnected .status-dot {
+    background: var(--danger);
+    animation: none;
+}
+
+.db-status.connecting .status-dot {
+    background: var(--warning);
+}
+
+.db-status.connected .status-text {
+    color: var(--success);
+}
+
+.db-status.disconnected .status-text {
+    color: var(--danger);
+}
+
+.db-status.connecting .status-text {
+    color: var(--warning);
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Dashboard Layout */
+#dashboardPage {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--background);
+}
+
+/* Navbar */
+.navbar {
+    background: var(--surface);
+    padding: var(--space-lg) var(--space-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-xl);
+    border: 1px solid var(--border);
+}
+
+.navbar h1 {
+    color: var(--text-primary);
+    font-size: var(--font-size-3xl);
+    margin: 0;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
+.nav-right span {
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+}
+
+/* Dashboard Content */
+.dashboard-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+/* Tab Bar */
+.tab-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    background: var(--surface);
+    padding: var(--space-md);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+}
+
+.tab-btn {
+    padding: 10px 18px;
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.tab-btn:hover {
+    color: var(--primary);
+    background: var(--surface-hover);
+}
+
+.tab-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Dashboard Sections */
+.dashboard-section {
+    display: none;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.dashboard-section.active {
+    display: flex;
+}
+
+/* Panel */
+.panel {
+    background: var(--surface);
+    padding: var(--space-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+}
+
+.panel h3 {
+    color: var(--text-primary);
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--space-lg);
+}
+
+.panel.hidden {
+    display: none;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+}
+
+.panel-header h3 {
+    margin: 0;
+}
+
+.panel-actions {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* Info Box */
+.info-box {
+    background: var(--surface-hover);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+/* Metrics Grid */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-md);
+}
+
+.metric-card {
+    background: var(--surface-hover);
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    text-align: center;
+}
+
+.metric-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-sm);
+}
+
+.metric-value {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Alert List */
+.alert-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.alert-list li {
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--border);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.alert-list li:last-child {
+    border-bottom: none;
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--space-2xl);
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.empty-state.hidden {
+    display: none;
+}
+
+/* Table Wrapper */
+.table-wrapper {
+    margin-top: var(--space-md);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table thead {
+    background: var(--surface-hover);
+}
+
+.data-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+}
+
+.data-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.data-table tbody tr {
+    transition: background var(--transition-fast);
+}
+
+.data-table tbody tr:hover {
+    background: var(--surface-hover);
+}
+
+.actions-col {
+    width: 200px;
+}
+
+/* Grid Form */
+.grid-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-lg);
+}
+
+.grid-form .full-width {
+    grid-column: 1 / -1;
+}
+
+/* Checkbox Inline */
+.checkbox-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+}
+
+.checkbox-inline input[type="checkbox"] {
+    cursor: pointer;
+}
+
+/* Pill Display */
+.pill-display {
+    display: inline-block;
+    padding: 6px 14px;
+    background: var(--surface-hover);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+}
+
+/* Restricted Content */
+.restricted {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* Status Indicators */
+.status-active {
+    color: var(--success);
+}
+
+.status-inactive {
+    color: var(--danger);
+}
+
+.status-low {
+    color: var(--warning);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .grid-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        gap: var(--space-md);
+        padding: var(--space-lg);
+    }
+
+    .navbar h1 {
+        font-size: var(--font-size-2xl);
+    }
+
+    .nav-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .panel {
+        padding: var(--space-lg);
+    }
+
+    .panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-md);
+    }
+
+    .panel-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .panel-actions input,
+    .panel-actions select,
+    .panel-actions button {
+        width: 100%;
+    }
+
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tab-bar {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+}

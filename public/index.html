@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management System</title>
+    <link rel="stylesheet" href="common-theme.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Login Page -->
+        <div id="loginPage" class="page active">
+            <div class="card">
+                <div class="status-bar">
+                    <span id="dbStatus" class="db-status">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Checking connection...</span>
+                    </span>
+                </div>
+                <h2>Login</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginUsername">Username</label>
+                        <input type="text" id="loginUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+                <div id="loginMessage" class="message"></div>
+            </div>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div id="dashboardPage" class="page">
+            <nav class="navbar">
+                <h1>Inventory Management System</h1>
+                <div class="nav-right">
+                    <span id="userDisplay"></span>
+                    <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+                </div>
+            </nav>
+
+            <div class="dashboard-content">
+                <div id="sectionTabs" class="tab-bar">
+                    <button class="tab-btn active" data-section="overviewSection">Overview</button>
+                    <button class="tab-btn" data-section="itemsSection">Items</button>
+                    <button class="tab-btn" data-section="suppliersSection">Suppliers</button>
+                    <button class="tab-btn" data-section="salesSection">Sales</button>
+                    <button class="tab-btn" data-section="reportsSection">Reports</button>
+                </div>
+
+                <section id="overviewSection" class="dashboard-section active">
+                    <div id="adminPanel" class="panel hidden">
+                        <h3>Admin Panel - Create New User</h3>
+                        <form id="registerForm">
+                            <div class="form-group">
+                                <label for="regUsername">Username</label>
+                                <input type="text" id="regUsername" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="regPassword">Password</label>
+                                <input type="password" id="regPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="regRole">Role</label>
+                                <select id="regRole" required>
+                                    <option value="staff">Staff</option>
+                                    <option value="manager">Manager</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Create User</button>
+                        </form>
+                        <div id="registerMessage" class="message"></div>
+                    </div>
+
+                    <div class="panel">
+                        <h3>Welcome to Inventory System</h3>
+                        <p>Track stock, suppliers, and sales with role-aware access.</p>
+                        <div id="userInfo" class="info-box"></div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Quick Metrics</h3>
+                            <button id="refreshOverviewBtn" class="btn btn-outline">Refresh</button>
+                        </div>
+                        <div id="overviewMetrics" class="metrics-grid"></div>
+                    </div>
+
+                    <div class="panel" id="alertsPanel">
+                        <div class="panel-header">
+                            <h3>Low Stock Alerts</h3>
+                            <button id="refreshAlertsBtn" class="btn btn-outline">Refresh</button>
+                        </div>
+                        <ul id="lowStockList" class="alert-list"></ul>
+                        <div id="lowStockEmptyState" class="empty-state hidden">No low stock items. All good!</div>
+                    </div>
+                </section>
+
+                <section id="itemsSection" class="dashboard-section">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Inventory Items</h3>
+                            <div class="panel-actions">
+                                <input type="text" id="itemSearch" placeholder="Search by name or category">
+                                <select id="itemCategoryFilter" aria-label="Filter by category">
+                                    <option value="">All Categories</option>
+                                </select>
+                                <select id="itemSupplierFilter" aria-label="Filter by supplier">
+                                    <option value="">All Suppliers</option>
+                                </select>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" id="lowStockToggle">
+                                    <span>Low stock only</span>
+                                </label>
+                                <button id="itemSearchBtn" class="btn btn-outline">Search</button>
+                                <button id="itemResetBtn" class="btn btn-ghost">Reset</button>
+                            </div>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Category</th>
+                                        <th>Supplier</th>
+                                        <th>Quantity</th>
+                                        <th>Reorder Level</th>
+                                        <th>Price</th>
+                                        <th>Status</th>
+                                        <th class="actions-col">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="itemsTableBody"></tbody>
+                            </table>
+                            <div id="itemsEmptyState" class="empty-state hidden">No inventory items found.</div>
+                        </div>
+                        <div id="itemMessage" class="message"></div>
+                    </div>
+
+                    <div id="itemFormPanel" class="panel restricted hidden">
+                        <h3 id="itemFormTitle">Add Item</h3>
+                        <form id="itemForm" class="grid-form">
+                            <input type="hidden" id="itemId">
+                            <div class="form-group">
+                                <label for="itemName">Item Name</label>
+                                <input type="text" id="itemName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="itemCategory">Category</label>
+                                <input type="text" id="itemCategory" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="itemSupplier">Supplier</label>
+                                <select id="itemSupplier">
+                                    <option value="">Select supplier (optional)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="itemQuantity">Quantity</label>
+                                <input type="number" id="itemQuantity" min="0" step="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="itemReorderLevel">Reorder Level</label>
+                                <input type="number" id="itemReorderLevel" min="0" step="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="itemPrice">Unit Price</label>
+                                <input type="number" id="itemPrice" min="0" step="0.01" required>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Save Item</button>
+                                <button type="button" id="itemCancelEdit" class="btn btn-ghost hidden">Cancel
+                                    Edit</button>
+                            </div>
+                        </form>
+                        <div id="itemFormMessage" class="message"></div>
+                    </div>
+                    <div class="panel restricted">
+                        <h3>Adjust Stock</h3>
+                        <form id="stockAdjustForm" class="grid-form">
+                            <div class="form-group">
+                                <label for="stockAdjustItem">Item</label>
+                                <select id="stockAdjustItem" required>
+                                    <option value="">Select item</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="stockAdjustAmount">Amount</label>
+                                <input type="number" id="stockAdjustAmount" min="0" step="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="stockAdjustOperation">Operation</label>
+                                <select id="stockAdjustOperation">
+                                    <option value="increase">Increase</option>
+                                    <option value="decrease">Decrease</option>
+                                    <option value="set">Set Exact Quantity</option>
+                                </select>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Apply</button>
+                                <button type="reset" id="stockAdjustReset" class="btn btn-ghost">Clear</button>
+                            </div>
+                        </form>
+                        <div id="stockAdjustMessage" class="message"></div>
+                    </div>
+                </section>
+
+                <section id="suppliersSection" class="dashboard-section">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Suppliers</h3>
+                            <button id="refreshSuppliersBtn" class="btn btn-outline">Refresh</button>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Contact</th>
+                                        <th>Email</th>
+                                        <th>Products</th>
+                                        <th class="actions-col">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="suppliersTableBody"></tbody>
+                            </table>
+                            <div id="suppliersEmptyState" class="empty-state hidden">No suppliers found.</div>
+                        </div>
+                        <div id="supplierMessage" class="message"></div>
+                    </div>
+
+                    <div id="supplierFormPanel" class="panel restricted hidden">
+                        <h3 id="supplierFormTitle">Add Supplier</h3>
+                        <form id="supplierForm" class="grid-form">
+                            <input type="hidden" id="supplierId">
+                            <div class="form-group">
+                                <label for="supplierName">Name</label>
+                                <input type="text" id="supplierName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="supplierContact">Contact</label>
+                                <input type="text" id="supplierContact">
+                            </div>
+                            <div class="form-group">
+                                <label for="supplierEmail">Email</label>
+                                <input type="email" id="supplierEmail">
+                            </div>
+                            <div class="form-group wide">
+                                <label for="supplierAddress">Address</label>
+                                <textarea id="supplierAddress"></textarea>
+                            </div>
+                            <div class="form-group wide">
+                                <label for="supplierProducts">Products (comma separated)</label>
+                                <input type="text" id="supplierProducts" placeholder="e.g. Laptops, Keyboards">
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Save Supplier</button>
+                                <button type="button" id="supplierCancelEdit" class="btn btn-ghost hidden">Cancel
+                                    Edit</button>
+                            </div>
+                        </form>
+                        <div id="supplierFormMessage" class="message"></div>
+                    </div>
+                </section>
+
+                <section id="salesSection" class="dashboard-section">
+                    <div class="panel">
+                        <h3>Record Sale</h3>
+                        <form id="saleForm" class="grid-form">
+                            <div class="form-group">
+                                <label for="saleItem">Item</label>
+                                <select id="saleItem" required>
+                                    <option value="">Select item</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="saleQuantity">Quantity Sold</label>
+                                <input type="number" id="saleQuantity" min="1" step="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="saleDate">Sale Date</label>
+                                <input type="date" id="saleDate">
+                            </div>
+                            <div class="form-group">
+                                <label>Total Amount</label>
+                                <div id="saleTotalDisplay" class="pill-display">₹0.00</div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Log Sale</button>
+                                <button type="reset" id="saleFormReset" class="btn btn-ghost">Clear</button>
+                            </div>
+                        </form>
+                        <div id="saleFormMessage" class="message"></div>
+                    </div>
+
+                    <div id="salesTablePanel" class="panel admin-only hidden">
+                        <div class="panel-header">
+                            <h3>Sales History</h3>
+                            <div class="panel-actions">
+                                <input type="date" id="salesFilterFrom" aria-label="Sales from date">
+                                <input type="date" id="salesFilterTo" aria-label="Sales to date">
+                                <button id="salesFilterBtn" class="btn btn-outline">Filter</button>
+                                <button id="salesResetBtn" class="btn btn-ghost">Reset</button>
+                            </div>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Item</th>
+                                        <th>Quantity</th>
+                                        <th>Total</th>
+                                        <th>Processed By</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="salesTableBody"></tbody>
+                            </table>
+                            <div id="salesEmptyState" class="empty-state hidden">No sales recorded for the selected
+                                range.</div>
+                        </div>
+                        <div id="salesTableMessage" class="message"></div>
+                    </div>
+                </section>
+
+                <section id="reportsSection" class="dashboard-section">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Sales Trend</h3>
+                            <div class="panel-actions">
+                                <select id="salesSummaryPeriod" aria-label="Sales summary period">
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                                <input type="date" id="salesSummaryFrom" aria-label="Sales summary from date">
+                                <input type="date" id="salesSummaryTo" aria-label="Sales summary to date">
+                                <button id="refreshSalesSummaryBtn" class="btn btn-outline">Refresh</button>
+                                <button id="exportSalesCsvBtn" class="btn btn-ghost">Export CSV</button>
+                            </div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="salesTrendChart" height="220"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Category Stock Levels</h3>
+                            <button id="refreshCategoryChartBtn" class="btn btn-outline">Refresh</button>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="categoryStockChart" height="220"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Revenue Summary</h3>
+                            <div class="panel-actions">
+                                <input type="date" id="revenueFrom" aria-label="Revenue from date">
+                                <input type="date" id="revenueTo" aria-label="Revenue to date">
+                                <button id="refreshRevenueBtn" class="btn btn-outline">Refresh</button>
+                                <button id="exportRevenueCsvBtn" class="btn btn-ghost">Export CSV</button>
+                            </div>
+                        </div>
+                        <div id="revenueSummary" class="info-box"></div>
+                    </div>
+
+                    <div id="reportsMessage" class="message"></div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
